@@ -3,35 +3,72 @@ import {
   View, Text, FlatList, Image, TouchableOpacity, 
   StyleSheet, ActivityIndicator 
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RecipeListScreen = ({ navigation }) => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=b'); // ✅ Fetch all meals by first letter (A)
+        const response = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=b'); 
         const data = await response.json();
 
         if (data.meals) {
-          setRecipes(data.meals); 
+          setRecipes(data.meals);
         } else {
-          setRecipes([]); 
+          setRecipes([]);
         }
 
       } catch (error) {
         console.error("API Error:", error);
       } finally {
-        setLoading(false); // ✅ Stop loading
+        setLoading(false);
       }
     };
 
     fetchRecipes();
+    loadFavorites(); // Charger les favoris au démarrage
   }, []);
+
+  // Charger les favoris depuis AsyncStorage
+  const loadFavorites = async () => {
+    try {
+      const savedFavorites = await AsyncStorage.getItem('favorites');
+      if (savedFavorites) {
+        setFavorites(JSON.parse(savedFavorites));
+      }
+    } catch (error) {
+      console.error("Erreur de chargement des favoris", error);
+    }
+  };
+
+  // Ajouter ou supprimer des favoris
+  const toggleFavorite = async (recipe) => {
+    let updatedFavorites = [...favorites];
+
+    if (favorites.some(fav => fav.idMeal === recipe.idMeal)) {
+      updatedFavorites = updatedFavorites.filter(fav => fav.idMeal !== recipe.idMeal);
+    } else {
+      updatedFavorites.push(recipe);
+    }
+
+    setFavorites(updatedFavorites);
+    await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  };
 
   return (
     <View style={styles.container}>
+      {/* Bouton pour voir les favoris */}
+      <TouchableOpacity 
+        style={styles.favoritesButton} 
+        onPress={() => navigation.navigate('FavoritesScreen')}
+      >
+        <Text style={styles.favoritesButtonText}>💖 Voir les favoris</Text>
+      </TouchableOpacity>
+
       <Text style={styles.title}>Liste des Recettes</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -46,6 +83,14 @@ const RecipeListScreen = ({ navigation }) => {
             >
               <Image source={{ uri: item.strMealThumb }} style={styles.image} />
               <Text style={styles.name}>{item.strMeal}</Text>
+              <TouchableOpacity 
+                style={styles.favoriteButton}
+                onPress={() => toggleFavorite(item)}
+              >
+                <Text style={styles.favoriteText}>
+                  {favorites.some(fav => fav.idMeal === item.idMeal) ? '💖 Retirer' : '🤍 Ajouter'}
+                </Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           )}
         />
@@ -61,6 +106,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
+  },
+  favoritesButton: {
+    backgroundColor: '#ff69b4',
+    padding: 10,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  favoritesButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 22,
@@ -94,6 +151,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     color: 'gray',
+  },
+  favoriteButton: {
+    marginTop: 10,
+    padding: 5,
+    backgroundColor: '#FFD700',
+    borderRadius: 5,
+  },
+  favoriteText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
