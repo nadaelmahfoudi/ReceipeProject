@@ -18,7 +18,6 @@ const Navigation = () => {
         <Stack.Screen name="ListMeal" component={RecipeListScreen} />
         <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
         <Stack.Screen name="RandomMeal" component={RandomMealScreen} />
-        <Stack.Screen name="Categories" component={CategoriesScreen} />
         <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} options={{ title: 'Favoris' }} />
       </Stack.Navigator>
     </NavigationContainer>
