@@ -5,8 +5,6 @@ import {
   Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// Remove this import since it's causing the error
-// import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const cardWidth = width * 0.9;
@@ -19,7 +17,7 @@ const RecipeListScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=b'); 
+        const response = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s='); 
         const data = await response.json();
 
         if (data.meals) {
@@ -84,7 +82,6 @@ const RecipeListScreen = ({ navigation }) => {
             <Text style={styles.favoriteIcon}>{isFavorite ? '❤️' : '🤍'}</Text>
           </TouchableOpacity>
           
-          {/* Replace LinearGradient with a regular View */}
           <View style={styles.gradient} />
           
           <View style={styles.categoryTag}>
@@ -118,15 +115,25 @@ const RecipeListScreen = ({ navigation }) => {
 
       <View style={styles.header}>
         <Text style={styles.title}>Délicieuses Recettes</Text>
-        <TouchableOpacity 
-          style={styles.favoritesButton} 
-          onPress={() => navigation.navigate('FavoritesScreen')}
-        >
-          <Text style={styles.favoritesButtonText}>Voir favoris</Text>
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>{favorites.length}</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity 
+            style={styles.favoritesButton} 
+            onPress={() => navigation.navigate('FavoritesScreen')}
+          >
+            <Text style={styles.favoritesButtonText}>Voir favoris</Text>
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>{favorites.length}</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Add Recipe Button */}
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('AddRecipe')} 
+          >
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading ? (
@@ -176,6 +183,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#212121',
   },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   favoritesButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,6 +212,20 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#FF5252',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  addButton: {
+    marginLeft: 16,
+    backgroundColor: '#FF5252',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 24,
     fontWeight: 'bold',
   },
   listContainer: {
@@ -229,7 +254,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  // Modified gradient style to use backgroundColor with opacity
   gradient: {
     position: 'absolute',
     bottom: 0,

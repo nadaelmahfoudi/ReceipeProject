@@ -25,14 +25,6 @@ const RecipeDetailScreen = ({ route, navigation }) => {
     navigation.setOptions({
       headerTransparent: true,
       headerTitle: '',
-      headerLeft: () => (
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation.navigate('ListMeal')} // Go to RecipeListScreen (ListMeal)
-        >
-          <Text style={styles.backButtonText}>Back</Text>
-        </TouchableOpacity>
-      ),
     });
 
     checkFavoriteStatus();
@@ -166,6 +158,14 @@ const RecipeDetailScreen = ({ route, navigation }) => {
           </View>
         </View>
       </ScrollView>
+      
+      {/* Back Button */}
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => navigation.navigate('ListMeal')} // Go to RecipeListScreen (ListMeal)
+      >
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -194,18 +194,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-  },
-  backButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderRadius: 18,
-    marginLeft: 16,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#5B86E5',
   },
   imageContainer: {
     height: 300,
@@ -319,7 +307,22 @@ const styles = StyleSheet.create({
     color: '#424242',
     flex: 1,
     lineHeight: 24,
-  }
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 18,
+    zIndex: 2, // Make sure it's above other components
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#5B86E5',
+  },
 });
 
 export default RecipeDetailScreen;
